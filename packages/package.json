@@ -4,5 +4,37 @@
   "main": "index.js",
   "repository": "https://github.com/venkatprabu711998/react-native-depictron.git",
   "author": "Venkatprabu Manickam",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@react-native-community/datetimepicker": "^6.2.2",
+    "@types/react-native": "^0.69.5",
+    "lodash": "^4.17.10",
+    "moment": "^2.29.4",
+    "prop-types": "^15.6.1",
+    "react-native-document-picker": "^8.1.1",
+    "react-native-file-viewer": "^2.1.5",
+    "react-native-modal-datetime-picker": "^13.1.2",
+    "react-native-ratings": "^8.1.0",
+    "react-native-safe-area-context": "^4.3.1",
+    "react-native-simple-radio-button": "^2.7.4",
+    "react-native-vector-icons": "^9.2.0",
+    "rn-fetch-blob": "^0.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/runtime": "^7.12.5",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.32.0",
+    "jest": "^26.6.3",
+    "metro-react-native-babel-preset": "^0.70.3",
+    "react-test-renderer": "18.0.0"
+  },
+  "peerDependencies": {
+    "react": "^16.2.0",
+    "react-native": "*"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }
