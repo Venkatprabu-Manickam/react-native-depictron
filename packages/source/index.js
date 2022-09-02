@@ -2,8 +2,8 @@ import React from 'react';
 import { Alert, ScrollView, Text, View, DeviceEventEmitter } from 'react-native';
 import PropTypes, { element } from 'prop-types';
 import _ from 'lodash';
-import { getInputType, validateExpression } from './utils';
-import { CHANGE_NEXT_PAGE, CHANGE_PREV_PAGE, FORM_ELEMENT } from './constants';
+import { getInputType, validateExpression } from '../common/utils';
+import { FORM_ELEMENT } from '../common/constants';
 import { styles } from './styles';
 
 import { buildTheme } from '../config/styles';
@@ -442,7 +442,7 @@ export class FormProvider extends React.PureComponent {
   };
 
   checkCondition = (conditional = {}) => {
-    const { parent, eq, show, when } = conditional;
+    const { parent, eq, when } = conditional;
     if (!parent && !when) return true;
     let dependentParentDic = parent ? _.get(this.state.responses, parent) : null;
     let dependentFieldValue = dependentParentDic ? dependentParentDic[when] : "";
@@ -450,14 +450,57 @@ export class FormProvider extends React.PureComponent {
     return _.lowerCase(dependentFieldValue) === _.lowerCase(eq);
   }
 
-  getRelativeFiledStyle(properties = {}) {
+  updateRelationalFieldValue = (element = {}) => {
+
+    const checkRelationFieldValue = (subElement, parent = "") => {
+      if (_.has(this.state.responses, parent)) {
+        let parentDic = _.get(this.state.responses, parent);
+        if (_.has(parentDic, subElement.key)) {
+          let targetKey = subElement.key;
+          let targetValue = _.get(parentDic, targetKey);
+          switch (typeof targetValue) {
+            case 'object':
+              if (Array.isArray(targetValue)) {
+                delete parentDic[targetKey]
+              } else {
+                delete parentDic[targetKey]
+              }
+              break;
+            case 'string':
+              delete parentDic[targetKey]
+              break;
+            default:
+              break;
+          }
+          _.set(this.state.responses, parent, parentDic);
+        }
+      }
+    };
+
+    const { elements = [], properties = {} } = element;
+    const { conditional = {} } = properties;
+    const { parent } = conditional;
+
+    switch (element.type) {
+      case FORM_ELEMENT.DSECTION:
+        _.forEach(elements, (sectionElement) => checkRelationFieldValue(sectionElement, parent))
+        break;
+      default:
+        checkRelationFieldValue(element, parent);
+        break;
+    }
+  }
+
+  getRelativeFiledStyle(element = {}) {
+    const { properties = {}, clearOnHide } = element;
     const { conditional } = properties;
     let relativeStyle = {};
     let isConditionSatisfied = this.checkCondition(conditional)
     if (isConditionSatisfied) {
       relativeStyle = { display: "flex" };
     } else {
-      relativeStyle = { display: "none" }
+      if (clearOnHide) this.updateRelationalFieldValue(element);
+      relativeStyle = { display: "none" };
     }
     return relativeStyle;
   };
@@ -503,7 +546,7 @@ export class FormProvider extends React.PureComponent {
       <DSection
         key={key}
         {...properties}
-        style={this.getRelativeFiledStyle(properties)}>
+        style={this.getRelativeFiledStyle(element)}>
         {
           _.map(sectionElements, element => {
             return (
@@ -530,7 +573,7 @@ export class FormProvider extends React.PureComponent {
     }
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <CustomInput
           {...moreOptions}
           style={properties.inputStyle}
@@ -562,7 +605,7 @@ export class FormProvider extends React.PureComponent {
       textAreaOptions.maxLength = Number(element.maxlength);
     }
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <CustomInput
           {...textAreaOptions}
           style={properties.inputStyle}
@@ -587,7 +630,7 @@ export class FormProvider extends React.PureComponent {
     const { key, subtype, style, required, properties } = element;
     const label = this.getFormElementLabel(element);
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <NumberSelector
           label={label}
           required={required}
@@ -624,7 +667,7 @@ export class FormProvider extends React.PureComponent {
     const label = this.getFormElementLabel(element);
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <Ratings
           type="star"
           starCount={(() => {
@@ -659,7 +702,7 @@ export class FormProvider extends React.PureComponent {
     }
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <RadioGroup
           {...radioOptions}
           label={label}
@@ -687,7 +730,7 @@ export class FormProvider extends React.PureComponent {
     }
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <CheckboxGroup
           {...checkOptions}
           label={label}
@@ -708,7 +751,7 @@ export class FormProvider extends React.PureComponent {
     const label = this.getFormElementLabel(element);
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <CustomDate
           placeholder={element.placeholder}
           label={label}
@@ -736,7 +779,7 @@ export class FormProvider extends React.PureComponent {
     };
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <Select
           {...multiOptions}
           searchInputPlaceholder={element.searchInputPlaceholder}
@@ -759,7 +802,7 @@ export class FormProvider extends React.PureComponent {
     const label = this.getFormElementLabel(element);
 
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <DocumentPicker
           label={label}
           multiSelection={element.multiSelection}
@@ -778,7 +821,7 @@ export class FormProvider extends React.PureComponent {
     const { key, style, required, choices = [], properties } = element;
     const label = this.getFormElementLabel(element);
     return (
-      <View key={key} style={[styles.row, this.getRelativeFiledStyle(properties)]}>
+      <View key={key} style={[styles.row, this.getRelativeFiledStyle(element)]}>
         <DSigleChoiceSelect
           label={this.getFormElementLabel(element)}
           value={this.getFormElementValue(key, element)}

@@ -6,7 +6,7 @@ import _ from 'lodash';
 import FileViewer from 'react-native-file-viewer';
 import {styles} from './styles';
 import LabelError from '../LabelError';
-import {getDocumentPicekerFileType} from '../../utils';
+import {getDocumentPicekerFileType} from '../../../common/utils';
 import images from '../../../assert';
 
 function FilePreview({type, uri}) {

@@ -1,1 +1,2 @@
-export {default as FormProvider} from './source';
+export * from './source';
+export * from './config';

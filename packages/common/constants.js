@@ -13,7 +13,3 @@ export const FORM_ELEMENT = {
     DSECTION : "DSection",
     DSINGLE_CHOICE : "DSingleChoice"
 };
-
-// Emitter Events
-export const CHANGE_NEXT_PAGE = "change_next_page";
-export const CHANGE_PREV_PAGE = 'change_prev_page';
